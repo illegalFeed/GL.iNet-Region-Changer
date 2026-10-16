@@ -7,9 +7,9 @@
 | Синтаксис POSIX sh: `sh -n beryl-region.sh` | Пройдено |
 | Проверка SHA-256 файла по SHA256SUMS | Пройдено |
 | Python unittest, выполнение функций в системном sh (dash) | 19 тестов пройдено |
-| Запуск через BusyBox ash | Не выполнен: BusyBox отсутствует в текущей среде |
-| ShellCheck | Не выполнен: ShellCheck отсутствует в текущей среде |
-| GitHub Actions | Автоматическая проверка настроена; актуальный результат — во вкладке Actions репозитория |
+| Запуск через BusyBox ash | Пройдено в GitHub Actions: 19 тестов в BusyBox ash; локально BusyBox отсутствует |
+| ShellCheck | Пройдено в GitHub Actions; локально ShellCheck отсутствует |
+| GitHub Actions | [Все шаги пройдены](https://github.com/illegalFeed/GL.iNet-Region-Changer/actions/runs/38890348369), код e4839fd2a094754dbaa68414058c4394665d2161 |
 | Чтение/запись Factory настоящего GL-MT3000 | Не выполнялись |
 | Сброс, перезагрузка, доступность VPN после смены на реальном устройстве | Не проверены |
 
