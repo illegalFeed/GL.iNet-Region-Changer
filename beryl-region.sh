@@ -58,9 +58,13 @@ hardware() {
     case "$MTD_INDEX" in ''|*[!0-9]*) die 'Некорректный номер MTD.' ;; esac
     case "$2" in ''|*[!0-9a-fA-F]*) die 'Некорректный размер MTD.' ;; esac
     EXPECTED_SIZE=$((0x$2))
-    [ "$EXPECTED_SIZE" -ge 65536 ] && [ "$EXPECTED_SIZE" -le 4194304 ] || die 'Неожиданный размер Factory.'
+    if [ "$EXPECTED_SIZE" -lt 65536 ] || [ "$EXPECTED_SIZE" -gt 4194304 ]; then
+        die 'Неожиданный размер Factory.'
+    fi
     DEVICE=/dev/mtdblock$MTD_INDEX
-    [ -b "$DEVICE" ] && [ -r "$DEVICE" ] || die 'Раздел Factory недоступен.'
+    if ! [ -b "$DEVICE" ] || ! [ -r "$DEVICE" ]; then
+        die 'Раздел Factory недоступен.'
+    fi
     say "Модель: GL-MT3000 (Beryl AX). Прошивка: $FIRMWARE"
 }
 snapshot() {
@@ -72,7 +76,9 @@ plan_image() {
     # Both original signatures are considered together. Numeric byte parsing
     # cannot accidentally match across half-byte boundaries of a hex string.
     strings "$1" > "$WORK/strings" || die 'Не удалось проверить содержимое Factory.'
-    grep -q firsttest "$WORK/strings" && grep -q secondtest "$WORK/strings" || die 'Структура Factory не распознана.'
+    if ! grep -q firsttest "$WORK/strings" || ! grep -q secondtest "$WORK/strings"; then
+        die 'Структура Factory не распознана.'
+    fi
     od -An -v -tu1 "$1" > "$WORK/bytes" || die 'Не удалось прочитать байты Factory.'
     awk '{for(i=1;i<=NF;i++){c=$i+0; if((a==0 || a==255) && b==67 && c==78 && n>=2) print n-1; a=b; b=c; n++}}' "$WORK/bytes" > "$WORK/offsets" || die 'Ошибка поиска региона.'
     COUNT=$(wc -l < "$WORK/offsets") || die 'Ошибка подсчёта совпадений.'
@@ -81,7 +87,9 @@ plan_image() {
         1) OFFSET=$(cat "$WORK/offsets") ;;
         *) die 'Найдено несколько сигнатур CN. Автоматическая запись остановлена; обратитесь к продавцу.' ;;
     esac
-    [ "$OFFSET" -gt 0 ] && [ "$OFFSET" -lt $((EXPECTED_SIZE - 1)) ] || die 'Некорректное положение кода региона.'
+    if [ "$OFFSET" -le 0 ] || [ "$OFFSET" -ge $((EXPECTED_SIZE - 1)) ]; then
+        die 'Некорректное положение кода региона.'
+    fi
 }
 prepare_image() {
     cp "$1" "$WORK/expected.img" || die 'Не удалось подготовить проверочный образ.'
@@ -136,7 +144,9 @@ main() {
     dependencies
     hardware
     if [ "$CHECK_ONLY" != 1 ]; then
-        [ -t 0 ] && [ -t 1 ] || die 'Нужен интерактивный SSH. Сначала скачайте файл, затем запустите его через sh.'
+        if ! [ -t 0 ] || ! [ -t 1 ]; then
+            die 'Нужен интерактивный SSH. Сначала скачайте файл, затем запустите его через sh.'
+        fi
         [ -w "$DEVICE" ] || die 'Factory недоступен для записи.'
     fi
     mkdir /tmp/beryl-region.lock 2>/dev/null || die 'Другой экземпляр уже работает или остался его lock-каталог. Обратитесь к продавцу.'
@@ -176,7 +186,9 @@ main() {
     say 'Теперь нужен сброс. Заводская копия на роутере при сбросе будет удалена; храните копию на компьютере.'
     say 'Можно выполнить сброс позже в панели: SYSTEM → Reset Firmware. Затем настройте роутер заново.'
     if confirm 'Сбросить настройки и перезагрузить сейчас? Для отказа просто нажмите Enter.' RESET; then
-        command -v firstboot >/dev/null 2>&1 && command -v reboot >/dev/null 2>&1 || die 'Команды сброса недоступны. Выполните сброс в панели.'
+        if ! command -v firstboot >/dev/null 2>&1 || ! command -v reboot >/dev/null 2>&1; then
+            die 'Команды сброса недоступны. Выполните сброс в панели.'
+        fi
         say 'Выполняем сброс. После перезагрузки SSH отключится — это ожидаемо.'
         firstboot -y || die 'Сброс не выполнен. Регион записан; используйте сброс в панели.'
         sync || die 'Сбой sync после сброса. Обратитесь к продавцу.'

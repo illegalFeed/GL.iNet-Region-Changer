@@ -41,7 +41,7 @@ ssh root@192.168.8.1
 Скопируйте **всю строку целиком**, вставьте в окно SSH и нажмите Enter:
 
 ```sh
-d=$(mktemp -d /tmp/beryl-start.XXXXXX) && curl -fL --connect-timeout 15 --max-time 90 https://raw.githubusercontent.com/illegalFeed/GL.iNet-Region-Changer/main/beryl-region.sh -o "$d/beryl-region.sh" && printf '%s  %s\n' 2cbaed8a57c27164339dff6222f70f039645ec7ff944d6f7a826f4597664f0a9 "$d/beryl-region.sh" | sha256sum -c - && sh "$d/beryl-region.sh"
+d=$(mktemp -d /tmp/beryl-start.XXXXXX) && curl -fL --connect-timeout 15 --max-time 90 https://raw.githubusercontent.com/illegalFeed/GL.iNet-Region-Changer/main/beryl-region.sh -o "$d/beryl-region.sh" && printf '%s  %s\n' 4640f7635f0f3665d112154f67cd824f5536cbe81c98001eec091e33bc8b8387 "$d/beryl-region.sh" | sha256sum -c - && sh "$d/beryl-region.sh"
 ```
 
 Команда скачивает одну фиксированную версию, проверяет контрольную сумму и запускает её. Если скачивание или проверка не удались, мастер не запустится. Автообновлений и загрузки кода из других репозиториев нет.

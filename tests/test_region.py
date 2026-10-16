@@ -249,7 +249,7 @@ main {'--check' if check else '--country=RU'}
         mtd.write_text('dev: size erasesize name\nmtd0: 00040000 00020000 "BL2"\nmtd2: 00200000 00020000 "Factory"\n')
         # Only substitute hardware paths and the kernel block-device predicate.
         functions = FUNCTIONS.replace('/tmp/sysinfo/board_name', str(board)).replace('/etc/glversion', str(firmware)).replace('/proc/mtd', str(mtd))
-        functions = functions.replace('[ -b "$DEVICE" ] && [ -r "$DEVICE" ]', 'true')
+        functions = functions.replace('! [ -b "$DEVICE" ] || ! [ -r "$DEVICE" ]', 'false')
         def run():
             return subprocess.run(SHELL, input=functions + '\nid() { printf 0; }\nhardware\nprintf "DEVICE=%s SIZE=%s" "$DEVICE" "$EXPECTED_SIZE"', text=True, capture_output=True)
         for alias in ('glinet,gl-mt3000', 'glinet,mt3000-snand', 'gl-mt3000'):
