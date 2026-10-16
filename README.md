@@ -114,16 +114,9 @@ d=$(mktemp -d /tmp/beryl-start.XXXXXX) && curl -fL --connect-timeout 15 --max-ti
 <details>
 <summary>Дополнительные сведения и результаты проверок</summary>
 
-Помощник использует неофициальный способ изменения заводского региона. GL.iNet официально его не поддерживает.
 
-Версия `1.0.0-rc1` прошла ShellCheck, 19 автотестов в двух командных оболочках и 14 сценариев с виртуальной флеш-памятью. Проверки на настоящем GL-MT3000, загрузка штатной прошивки после изменения и работа VPN на устройстве ещё не выполнялись.
-
-- [Отчёт о проверках](docs/TEST_REPORT.md)
-- [Как устроен стенд без настоящего роутера](docs/EMULATION.md)
-- [Информация для владельца репозитория](docs/MAINTAINER.md)
 - [Официальная инструкция GL.iNet по подключению](https://docs.gl-inet.com/router/en/4/tutorials/ssh_log_in_to_the_router/)
 - [Официальная инструкция по сбросу](https://docs.gl-inet.com/router/en/4/interface_guide/reset_firmware/)
 
-Основано на [Oasis-2023/glinet-remove-chinalock](https://github.com/Oasis-2023/glinet-remove-chinalock). Автор исходного метода — Aaron Viehl (Admon). Лицензия [MIT](LICENSE), описание изменений — [NOTICE.md](NOTICE.md).
 
 </details>
