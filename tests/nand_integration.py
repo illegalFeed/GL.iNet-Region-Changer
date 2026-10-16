@@ -221,7 +221,10 @@ def main():
             print(json.dumps(report, ensure_ascii=False, indent=2), flush=True)
     finally:
         if loaded:
-            run('modprobe', '-r', 'nandsim')
+            # Detach the block translation layer first. Use leaf rmmod calls:
+            # BusyBox modprobe -r also tries shared dependencies still in use.
+            run('rmmod', 'mtdblock')
+            run('rmmod', 'nandsim')
 
 
 if __name__ == '__main__':
