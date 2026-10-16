@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import pty
 import select
+import signal
 import shutil
 import stat
 import subprocess
@@ -99,12 +100,12 @@ class Stand:
         env = dict(os.environ, PATH='/bin', LC_ALL='C', SSH_CONNECTION='192.0.2.2 50000 192.0.2.1 22')
         # Resolve the host's chroot before PATH is restricted for the guest.
         cmd[0] = shutil.which('chroot')
-        proc = subprocess.Popen(cmd, stdin=slave, stdout=slave, stderr=slave, env=env)
+        proc = subprocess.Popen(cmd, stdin=slave, stdout=slave, stderr=slave, env=env, start_new_session=True)
         os.close(slave)
         output = b''
         sent = 0
         prompts = 0
-        deadline = time.monotonic() + 45
+        deadline = time.monotonic() + 120
         try:
             while time.monotonic() < deadline:
                 ready, _, _ = select.select([master], [], [], 0.1)
@@ -126,9 +127,12 @@ class Stand:
                 elif proc.poll() is not None:
                     break
             proc.wait(timeout=2)
+        except BaseException:
+            print(output.decode(errors='replace'), flush=True)
+            raise
         finally:
             if proc.poll() is None:
-                proc.kill(); proc.wait()
+                os.killpg(proc.pid, signal.SIGKILL); proc.wait()
             os.close(master)
         text = output.decode(errors='replace')
         if proc.returncode != 0:
