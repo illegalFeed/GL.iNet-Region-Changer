@@ -1,0 +1,25 @@
+name: NAND integration
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  unmodified-script-on-nandsim:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable NAND simulation
+        shell: bash
+        run: |
+          set -euo pipefail
+          uname -a
+          sudo apt-get update
+          sudo apt-get install -y busybox-static kmod
+          if ! modinfo nandsim >/dev/null 2>&1; then
+            sudo apt-get install -y "linux-modules-extra-$(uname -r)"
+          fi
+          modinfo nandsim | head -20
+      - name: Exercise the unchanged client script through real Linux MTD
+        run: sudo env BERYL_EPHEMERAL_NAND_TEST=1 python3 tests/nand_integration.py
