@@ -207,7 +207,8 @@ def main():
         run('modprobe', 'mtdblock')
         run('modprobe', 'nandsim', 'first_id_byte=0x20', 'second_id_byte=0xaa', 'third_id_byte=0x00', 'fourth_id_byte=0x15', 'parts=16')
         loaded = True
-        run('udevadm', 'settle')
+        if shutil.which('udevadm'):
+            run('udevadm', 'settle')
         candidates = [p for p in Path('/sys/class/mtd').glob('mtd[0-9]*') if not p.name.endswith('ro') and (p/'name').exists() and 'NAND simulator' in (p/'name').read_text() and int((p/'size').read_text()) == SIZE]
         assert len(candidates) == 1, f'Expected exactly one 2 MiB nandsim partition: {candidates}'
         with tempfile.TemporaryDirectory(prefix='beryl-nandsim-') as temp:

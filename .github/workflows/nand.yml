@@ -7,19 +7,12 @@ permissions:
 jobs:
   unmodified-script-on-nandsim:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare disposable NAND simulation
-        shell: bash
-        run: |
-          set -euo pipefail
-          uname -a
-          sudo apt-get update
-          sudo apt-get install -y busybox-static kmod
-          if ! modinfo nandsim >/dev/null 2>&1; then
-            sudo apt-get install -y "linux-modules-extra-$(uname -r)"
-          fi
-          modinfo nandsim | head -20
-      - name: Exercise the unchanged client script through real Linux MTD
-        run: sudo env BERYL_EPHEMERAL_NAND_TEST=1 python3 tests/nand_integration.py
+      - name: Prepare isolated virtual machine tools
+        run: sudo apt-get update && sudo apt-get install -y busybox-static qemu-system-x86 cpio kmod
+      - name: Build a disposable VM with a Debian kernel and NAND modules
+        run: sudo python3 tests/build_nand_vm.py
+      - name: Exercise unchanged client script through guest Linux MTD
+        run: sudo python3 tests/run_nand_vm.py
